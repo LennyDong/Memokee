@@ -15,6 +15,22 @@ router.get('/newuser', function (req, res) {
     });
 });
 
+/* GET login page. */
+router.get('/login', function (req, res) {
+    res.render('login', {
+        title: 'Login'
+    });
+});
+
+/* POST login page. */
+router.post('/login', function (req, res) {
+    res.send(' ');
+});
+
+/* GET successLogin page. */
+router.get('/successLogin', function (req, res) {
+    res.render('successLogin')
+});
 
 router.post('/adduser', function (req, res) {
     var email = req.body.useremail;
