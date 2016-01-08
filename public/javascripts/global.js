@@ -15,14 +15,21 @@ function login(event) {
 
 
 	if(errorCount === 0) {
+
+		var loginAttempt = {
+			'email': $('field#login input#inputEmail').val(),
+			'password': $('field#login input#inputPassword').val()
+		}
 		$.ajax({
 			type: 'POST',
+			data: loginAttempt,
 			url: '/login',
+			dataType: 'JSON'
 		}).done(function (response) {
-			if (response === '') {
+			if (response.msg === 'true') {
 				document.location.href='/successLogin'
 			} else {
-				alert('You have entered the wrong email/password')
+				alert('Wrong email/password')
 			}
 		});
 	} else {

@@ -1,5 +1,5 @@
 var crypto = require("crypto"),
-	key = 'from_Berkeley_to_UMD',
+	key = 'testsalt',
 	plaintext= 'password',
 	cipher = crypto.createCipher('aes-256-cbc', key),
 	decipher = crypto.createDecipher('aes-256-cbc', key);
@@ -12,6 +12,7 @@ cipher.update(plaintext, 'utf8', 'base64');
 
 // Spits out the encrypted password
 var encryptedPassword = cipher.final('base64');
+console.log(encryptedPassword);
 
 // Feeds the decipher with :
 //		1) The encrypted password
@@ -21,4 +22,5 @@ decipher.update(encryptedPassword, 'base64', 'utf8');
 
 // Spits out the original password
 var decryptedPassword = decipher.final('utf8');
+console.log(decryptedPassword);
 
