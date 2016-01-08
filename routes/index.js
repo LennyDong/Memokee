@@ -11,13 +11,15 @@ router.get('/', function (req, res, next) {
 /* GET Userlist page. */
 router.get('/newuser', function (req, res) {
     res.render('newuser', {
-        "userlist": docs
+        title: 'Create account'
     });
 });
 
 
 router.post('/adduser', function (req, res) {
-    if (req.body.userpassword === req.body.userconfirmpassword) {
+    var pw = req.body.userpassword;
+    var conf = req.body.userconfirmpassword;
+    if (conf.localeCompare(password) == 0) {
         var ref = new Firebase('https://memokee.firebaseio.com/');
         //need encryption
 
