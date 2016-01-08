@@ -35,20 +35,24 @@ router.post('/login', function (req, res) {
     var salt = user.child('salt');
     var passwordHash = user.child('hash');
 
-    salt.on('value', function(snapshot) {
+    salt.on('value', function (snapshot) {
         salt = snapshot.val();
     });
 
-    passwordHash.on('value', function(snapshot) {
+    passwordHash.on('value', function (snapshot) {
         passwordHash = snapshot.val();
     });
 
     var cipher = crypto.createCipher('aes-256-cbc', salt);
     cipher.update(password, 'utf8', 'base64');
     if (cipher.final('base64') === passwordHash) {
-        res.send({msg: 'true'});
+        res.send({
+            msg: 'true'
+        });
     } else {
-        res.send({msg: ''});
+        res.send({
+            msg: ''
+        });
     }
 });
 
@@ -57,20 +61,27 @@ router.get('/successLogin', function (req, res) {
     res.render('successLogin')
 });
 
-router.post('/adduser', function (req, res) {
-    var email = req.body.useremail;
-    var pw = req.body.userpassword;
-    var conf = req.body.userconfirmpassword;
-    if (conf.localeCompare(password) == 0) {
-        var ref = new Firebase('https://memokee.firebaseio.com/');
-
-        ref.set({
-            email: email,
-            password: pw
-        });
+router.post('/newuser', function (req, res) {
+    var email = req.body.email;
+    var password = req.body.password;
+    var emailHash = crypto.createHash('md5').update(email).digest('hex');
+    var usersRef = ref.child('users');
+    if (usersRef.child(emailHash)) {
+        //if the email already exists
+        console.log("email exists")
     } else {
-        console.log('passwords do not match')
+        //need to make that a 
+        var salt = "testsalt"
+        var cipher = crypto.createCipher('aes-256-cbc', salt);
+        cipher.update(password, 'utf8', 'base64');
+        var submit = {
+            emailHash: {
+                "salt": salt,
+                "hash": ciper
+            }
+
+        }
     }
-})
+});
 
 module.exports = router;
