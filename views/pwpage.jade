@@ -1,0 +1,11 @@
+extends layout
+head
+    script(src='https://cdn.firebase.com/js/client/2.2.1/firebase.js')
+
+block content
+
+    h1= title
+    field#search(name="adduser")
+        input#searchBar(type="text", placeholder="facebook", name="searchtext")
+        br
+        button#btnSearch(type='button') Search

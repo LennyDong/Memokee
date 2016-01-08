@@ -2,8 +2,10 @@
 $(document).ready(function () {
     $('#btnLogin').on('click', login);
     $('#btnCreate').on('click', createAcc);
+    $('#btnSearch').on('click', searchDB);
 });
 
+var loggedIn;
 // Functions ========================================
 function login(event) {
     event.preventDefault();
@@ -28,6 +30,7 @@ function login(event) {
             dataType: 'JSON'
         }).done(function (response) {
             if (response.msg === 'true') {
+                loggedIn = $('field#login input#inputEmail').val();
                 document.location.href = '/successLogin'
             } else {
                 alert('Wrong email/password')
@@ -78,5 +81,42 @@ function createAcc(event) {
     } else {
         alert('Please fill in all fields');
         return false;
+    }
+};
+
+
+function searchDB(event) {
+    event.preventDefault();
+    var errorCount = 0;
+    $('#search input').each(function (index, val) {
+        if ($(this).val() === '') {
+            errorCount++;
+        }
+    });
+    if (errorCount === 0) {
+        console.log('no empty fields');
+        var search = $('field#search input#searchBar').val();
+
+
+        var createAttempt = {
+            'email': email,
+            'password': password,
+        }
+        $.ajax({
+            type: 'GET',
+            data: createAttempt,
+            url: '/pwpage',
+            dataType: 'JSON'
+        }).done(function (response) {
+            if (response.msg === 'true') {
+                document.location.href = '/successCreate'
+            } else {
+                console.log("message is below");
+                console.log(response.msg);
+                alert('Something wrong happened')
+            }
+        });
+    } else {
+        console.log('Passwords do not match.')
     }
 };

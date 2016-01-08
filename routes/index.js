@@ -34,16 +34,12 @@ router.post('/login', function (req, res) {
     var user = usersRef.child(emailHash);
     var salt = user.child('salt');
     var passwordHash = user.child('hash');
-
     salt.on('value', function (snapshot) {
         salt = snapshot.val();
     });
-
     passwordHash.on('value', function (snapshot) {
         passwordHash = snapshot.val();
     });
-
-
     var cipher = crypto.createCipher('aes-256-cbc', salt);
     cipher.update(password, 'utf8', 'base64');
     if (cipher.final('base64') === passwordHash) {
@@ -68,22 +64,25 @@ router.get('/successLogin', function (req, res) {
     res.render('successLogin')
 });
 
+
 router.post('/newuser', function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
     var emailHash = hash(email);
     var usersRef = ref.child('users');
     usersRef.child(emailHash).once('value', function (snapshot) {
-        if (snapshot.val() !== null) {
-            res.send({
-                msg: '',
-            });
-        } else {
-            var salt = "testsalt";
-            var submit = {};
-            submit[emailHash] = {
-                'salt': salt,
-                'hash': getCipheredPassword(password, salt)
+            if (snapshot.val() !== null) {
+                res.send({
+                    msg: '',
+                });
+            } else {
+                var salt = "testsalt";
+                var submit = {};
+                submit[emailHash] = {
+                    'salt': salt,
+                    'hash': getCipheredPassword(password, salt),
+                    'list': {}
+                }
             };
             usersRef.update(submit);
             res.send({
