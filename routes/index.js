@@ -29,7 +29,7 @@ router.get('/login', function (req, res) {
 router.post('/login', function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
-    var emailHash = crypto.createHash('md5').update(email).digest('hex');
+    var emailHash = hash(email);
     var usersRef = ref.child('users');
     var user = usersRef.child(emailHash);
     var salt = user.child('salt');
@@ -43,9 +43,8 @@ router.post('/login', function (req, res) {
         passwordHash = snapshot.val();
     });
 
-    var cipher = crypto.createCipher('aes-256-cbc', salt);
-    cipher.update(password, 'utf8', 'base64');
-    if (cipher.final('base64') === passwordHash) {
+    var cipheredPassword = getCipheredPassword(password, salt);
+    if (cipheredPassword === passwordHash) {
         res.send({msg: 'true'});
     } else {
         res.send({msg: ''});
@@ -73,4 +72,15 @@ router.post('/adduser', function (req, res) {
     }
 })
 
+/* Hashes input EMAIL. */
+function hash(email) {
+    return crypto.createHash('md5').update(email).digest('hex');
+}
+
+/* Get ciphered PASSWORD with SALT. */
+function getCipheredPassword(password, salt) {
+    var cipher = crypto.createCipher('aes-256-cbc', salt);
+    cipher.update(password, 'utf8', 'base64');
+    return cipher.final('base64');
+}
 module.exports = router;
