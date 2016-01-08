@@ -31,46 +31,33 @@ router.post('/login', function (req, res) {
     var password = req.body.password;
     var emailHash = hash(email);
     var usersRef = ref.child('users');
-    var user = usersRef.child(emailHash);
-    var salt = user.child('salt');
-    var passwordHash = user.child('hash');
 
-    salt.on('value', function(snapshot) {
-        salt = snapshot.val();
+    usersRef.once('value', function(snapshot) {
+        var exists = (snapshot.child(emailHash).val() !== null);
+        if (exists) {
+            var user = usersRef.child(emailHash);
+            user.child('salt').on('value', function(snapshot) {
+                var salt = snapshot.val();
+                var cipheredPassword = getCipheredPassword(password, salt);
+                user.child('hash').on('value', function(snapshot) {
+                    var passwordHash = snapshot.val();
+                    if (cipheredPassword === passwordHash) {
+                        res.send({msg: 'true'});
+                    } else {
+                        res.send({msg: ''});
+                    }
+                });
+            });
+        } else{
+            res.send({msg: ''});
+        }
     });
-
-    passwordHash.on('value', function(snapshot) {
-        passwordHash = snapshot.val();
-    });
-
-    var cipheredPassword = getCipheredPassword(password, salt);
-    if (cipheredPassword === passwordHash) {
-        res.send({msg: 'true'});
-    } else {
-        res.send({msg: ''});
-    }
 });
 
 /* GET successLogin page. */
 router.get('/successLogin', function (req, res) {
     res.render('successLogin')
 });
-
-router.post('/adduser', function (req, res) {
-    var email = req.body.useremail;
-    var pw = req.body.userpassword;
-    var conf = req.body.userconfirmpassword;
-    if (conf.localeCompare(password) == 0) {
-        var ref = new Firebase('https://memokee.firebaseio.com/');
-
-        ref.set({
-            email: email,
-            password: pw
-        });
-    } else {
-        console.log('passwords do not match')
-    }
-})
 
 /* Hashes input EMAIL. */
 function hash(email) {

@@ -27,9 +27,9 @@ function login(event) {
 			dataType: 'JSON'
 		}).done(function (response) {
 			if (response.msg === 'true') {
-				document.location.href='/successLogin'
+				document.location.href='/successLogin';
 			} else {
-				alert('Wrong email/password')
+				alert('Wrong email/password');
 			}
 		});
 	} else {
