@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
     });
 });
 
-/* GET Userlist page. */
+/* GET newuser page. */
 router.get('/newuser', function (req, res) {
     res.render('newuser', {
         title: 'Create account'
@@ -17,16 +17,19 @@ router.get('/newuser', function (req, res) {
 
 
 router.post('/adduser', function (req, res) {
+    var email = req.body.useremail;
     var pw = req.body.userpassword;
     var conf = req.body.userconfirmpassword;
     if (conf.localeCompare(password) == 0) {
         var ref = new Firebase('https://memokee.firebaseio.com/');
-        //need encryption
 
+        ref.set({
+            email: email,
+            password: pw
+        });
     } else {
-        //passwords did not match
+        console.log('passwords do not match')
     }
-}
 })
 
 module.exports = router;
