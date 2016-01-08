@@ -59,6 +59,37 @@ router.get('/successLogin', function (req, res) {
     res.render('successLogin')
 });
 
+router.post('/newuser', function (req, res) {
+    var email = req.body.email;
+    var password = req.body.password;
+    var emailHash = hash(email);
+    var usersRef = ref.child('users');
+    usersRef.child(emailHash).once('value', function (snapshot) {
+        if (snapshot.val() !== null) {
+            res.send({
+                msg: '',
+            });
+        } else {
+            var salt = "testsalt";
+            var submit = {};
+            submit[emailHash] = {
+                'salt': salt,
+                'hash': getCipheredPassword(password, salt)
+            };
+            usersRef.update(submit);
+            res.send({
+                msg: 'true'
+            });
+        }
+    });
+});
+
+
+/* GET successcreate page. */
+router.get('/successCreate', function (req, res) {
+    res.render('successCreate')
+});
+
 /* Hashes input EMAIL. */
 function hash(email) {
     return crypto.createHash('md5').update(email).digest('hex');

@@ -1,9 +1,14 @@
 extends layout
+head
+    script(src='https://cdn.firebase.com/js/client/2.2.1/firebase.js')
 
 block content
+
     h1= title
-    form#formAddUser(name="adduser",method="post",action="/adduser")
+    field#formAddUser(name="adduser")
         input#inputUserEmail(type="email", placeholder="test@test.com", name="useremail")
+        br
         input#inputUserPassword(type="password", placeholder="", name="userpassword")
+        br
         input#inputUserConfirmPassword(type="password", placeholder="", name="userconfirmpassword")
-        button#btnSubmit(type="submit") submit
+        button#btnCreate(type='button') Submit
