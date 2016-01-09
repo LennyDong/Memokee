@@ -31,9 +31,13 @@ function login(event) {
         }).done(function (response) {
             if (response.msg === 'true') {
                 loggedIn = $('field#login input#inputEmail').val();
+<<<<<<< HEAD
                 document.location.href = '/pwpage'
+=======
+                document.location.href = '/successLogin';
+>>>>>>> 5f9367c0ce4a3df238928294b4a025616aace66b
             } else {
-                alert('Wrong email/password')
+                alert('Wrong email/password');
             }
         });
     } else {
