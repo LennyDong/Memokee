@@ -31,32 +31,27 @@ router.post('/login', function (req, res) {
     var password = req.body.password;
     var emailHash = hash(email);
     var usersRef = ref.child('users');
-    var user = usersRef.child(emailHash);
-    var salt = user.child('salt');
-    var passwordHash = user.child('hash');
-    salt.on('value', function (snapshot) {
-        salt = snapshot.val();
-    });
-    passwordHash.on('value', function (snapshot) {
-        passwordHash = snapshot.val();
-    });
-    var cipher = crypto.createCipher('aes-256-cbc', salt);
-    cipher.update(password, 'utf8', 'base64');
-    if (cipher.final('base64') === passwordHash) {
-        res.send({
-            msg: 'true'
-        });
-        var cipheredPassword = getCipheredPassword(password, salt);
-        if (cipheredPassword === passwordHash) {
-            res.send({
-                msg: 'true'
+
+    usersRef.once('value', function(snapshot) {
+        var exists = (snapshot.child(emailHash).val() !== null);
+        if (exists) {
+            var user = usersRef.child(emailHash);
+            user.child('salt').on('value', function(snapshot) {
+                var salt = snapshot.val();
+                var cipheredPassword = getCipheredPassword(password, salt);
+                user.child('hash').on('value', function(snapshot) {
+                    var passwordHash = snapshot.val();
+                    if (cipheredPassword === passwordHash) {
+                        res.send({msg: 'true'});
+                    } else {
+                        res.send({msg: ''});
+                    }
+                });
             });
-        } else {
-            res.send({
-                msg: ''
-            });
+        } else{
+            res.send({msg: ''});
         }
-    }
+    });
 });
 
 /* get all the pw's, usernames, and services */
@@ -74,25 +69,22 @@ router.get('/successLogin', function (req, res) {
     res.render('successLogin')
 });
 
-
 router.post('/newuser', function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
     var emailHash = hash(email);
     var usersRef = ref.child('users');
     usersRef.child(emailHash).once('value', function (snapshot) {
-            if (snapshot.val() !== null) {
-                res.send({
-                    msg: '',
-                });
-            } else {
-                var salt = "testsalt";
-                var submit = {};
-                submit[emailHash] = {
-                    'salt': salt,
-                    'hash': getCipheredPassword(password, salt),
-                    'list': {}
-                }
+        if (snapshot.val() !== null) {
+            res.send({
+                msg: '',
+            });
+        } else {
+            var salt = "testsalt";
+            var submit = {};
+            submit[emailHash] = {
+                'salt': salt,
+                'hash': getCipheredPassword(password, salt)
             };
             usersRef.update(submit);
             res.send({
