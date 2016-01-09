@@ -15,10 +15,7 @@ function login(event) {
             errorCount++;
         }
     });
-
-
     if (errorCount === 0) {
-
         var loginAttempt = {
             'email': $('field#login input#inputEmail').val(),
             'password': $('field#login input#inputPassword').val()
@@ -31,17 +28,13 @@ function login(event) {
         }).done(function (response) {
             if (response.msg === 'true') {
                 loggedIn = $('field#login input#inputEmail').val();
-<<<<<<< HEAD
                 document.location.href = '/pwpage'
-=======
-                document.location.href = '/successLogin';
->>>>>>> 5f9367c0ce4a3df238928294b4a025616aace66b
             } else {
-                alert('Wrong email/password');
+                document.getElementById('message').innerHTML = 'Invalid combination of username or password';
             }
         });
     } else {
-        alert('Please fill in all fields');
+        document.getElementById('message').innerHTML = 'Please fill in all fields';
         return false;
     }
 };
@@ -77,7 +70,7 @@ function createAcc(event) {
                 } else {
                     console.log("message is below");
                     console.log(response.msg);
-                    alert('Something wrong happened')
+                    document.getElementById('message').innerHTML = 'Account already exists!';
                 }
             });
         } else {
@@ -113,17 +106,45 @@ function searchDB(event) {
                 data: searchAttempt,
                 url: '/pwpage',
                 dataType: 'JSON'
-                    //NEED TO EDIT BELOW THIS
             }).done(function (response) {
-                console.log(response)
-//                if (response.length === 0) {
-     //                    console.log('no matches.')
-     //                } else {
-     //                    console.log(response)
-     //                }
+                //clear table
+                $("#display tr").remove();
+                //set headings of table
+                insertOriginal(document.getElementById("display"));
+                console.log('response received');
+                console.log(response);
+                keys = Object.keys(response);
+                console.log('keys');
+                console.log(keys);
+                keys.forEach(function (key) {
+                    if (key.indexOf(search) !== -1) {
+                        document.getElementById("message").innerHTML = 'See results below';
+                        insertRow(document.getElementById("display"), response, key);
+                    }
+                });
             });
         } else {
-            console.log('Nothing in search bar..')
+            document.getElementById("message").innerHTML = 'Nothing in search bar..';
         }
     }
 };
+
+function insertRow(table, combinations, service) {
+    var row = table.insertRow(table.rows.length);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    cell1.innerHTML = service;
+    cell2.innerHTML = combinations[service]['username'];
+    cell3.innerHTML = combinations[service]['password'];
+}
+
+function insertOriginal(table) {
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    cell1.innerHTML = 'Service';
+    cell2.innerHTML = 'Username';
+    cell3.innerHTML = 'Password';
+}
