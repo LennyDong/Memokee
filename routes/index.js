@@ -32,37 +32,58 @@ router.post('/login', function (req, res) {
     var emailHash = hash(email);
     var usersRef = ref.child('users');
 
-    usersRef.once('value', function(snapshot) {
+    usersRef.once('value', function (snapshot) {
         var exists = (snapshot.child(emailHash).val() !== null);
         if (exists) {
             var user = usersRef.child(emailHash);
-            user.child('salt').on('value', function(snapshot) {
+            user.child('salt').on('value', function (snapshot) {
                 var salt = snapshot.val();
                 var cipheredPassword = getCipheredPassword(password, salt);
-                user.child('hash').on('value', function(snapshot) {
+                user.child('hash').on('value', function (snapshot) {
                     var passwordHash = snapshot.val();
                     if (cipheredPassword === passwordHash) {
-                        res.send({msg: 'true'});
+                        res.send({
+                            msg: 'true'
+                        });
                     } else {
-                        res.send({msg: ''});
+                        res.send({
+                            msg: ''
+                        });
                     }
                 });
             });
-        } else{
-            res.send({msg: ''});
+        } else {
+            res.send({
+                msg: ''
+            });
         }
     });
 });
 
+
 /* get all the pw's, usernames, and services */
-router.get('/pwpage', function (req, res) {
+router.post('/pwpage', function (req, res) {
     var email = req.body.email;
     var search = req.body.search;
-    var usersRef = ref.child('users');
-    var user = usersRef.child(hash(email));
-    var services = Object.keys(user);
+    var services = ref.child('users').child(hash(email)).child('list');
+    var jS;
+    services.once('value', function (snapshot) {
+        jS = Object.keys(snapshot.val());
 
+
+        var possibleHits = [];
+        jS.forEach(function (service) {
+            if (service.indexOf(search.toLowerCase()) === 0) {
+                possibleHits.push(service);
+            }
+        });
+        res.send(possibleHits);
+    });
 });
+
+router.get('/pwpage', function (req, res) {
+    res.render('pwpage');
+})
 
 /* GET successLogin page. */
 router.get('/successLogin', function (req, res) {

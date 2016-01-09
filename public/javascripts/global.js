@@ -5,7 +5,7 @@ $(document).ready(function () {
     $('#btnSearch').on('click', searchDB);
 });
 
-var loggedIn;
+var loggedIn = "test@testdomain.com";
 // Functions ========================================
 function login(event) {
     event.preventDefault();
@@ -31,7 +31,7 @@ function login(event) {
         }).done(function (response) {
             if (response.msg === 'true') {
                 loggedIn = $('field#login input#inputEmail').val();
-                document.location.href = '/successLogin'
+                document.location.href = '/pwpage'
             } else {
                 alert('Wrong email/password')
             }
@@ -69,7 +69,7 @@ function createAcc(event) {
             }).done(function (response) {
                 if (response.msg === 'true') {
                     loggedIn =
-                        document.location.href = '/successCreate'
+                        document.location.href = '/pwpage'
                 } else {
                     console.log("message is below");
                     console.log(response.msg);
@@ -105,22 +105,21 @@ function searchDB(event) {
                 'search': search,
             }
             $.ajax({
-                type: 'GET',
-                data: createAttempt,
+                type: 'POST',
+                data: searchAttempt,
                 url: '/pwpage',
                 dataType: 'JSON'
                     //NEED TO EDIT BELOW THIS
             }).done(function (response) {
-                if (response.msg === 'true') {
-                    document.location.href = '/successCreate'
-                } else {
-                    console.log("message is below");
-                    console.log(response.msg);
-                    alert('Something wrong happened')
-                }
+                console.log(response)
+//                if (response.length === 0) {
+     //                    console.log('no matches.')
+     //                } else {
+     //                    console.log(response)
+     //                }
             });
         } else {
-            console.log('Passwords do not match.')
+            console.log('Nothing in search bar..')
         }
     }
 };
