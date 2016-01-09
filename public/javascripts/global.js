@@ -68,7 +68,8 @@ function createAcc(event) {
                 dataType: 'JSON'
             }).done(function (response) {
                 if (response.msg === 'true') {
-                    document.location.href = '/successCreate'
+                    loggedIn =
+                        document.location.href = '/successCreate'
                 } else {
                     console.log("message is below");
                     console.log(response.msg);
@@ -88,35 +89,38 @@ function createAcc(event) {
 function searchDB(event) {
     event.preventDefault();
     var errorCount = 0;
-    $('#search input').each(function (index, val) {
-        if ($(this).val() === '') {
-            errorCount++;
-        }
-    });
-    if (errorCount === 0) {
-        console.log('no empty fields');
-        var search = $('field#search input#searchBar').val();
-
-
-        var createAttempt = {
-            'email': email,
-            'password': password,
-        }
-        $.ajax({
-            type: 'GET',
-            data: createAttempt,
-            url: '/pwpage',
-            dataType: 'JSON'
-        }).done(function (response) {
-            if (response.msg === 'true') {
-                document.location.href = '/successCreate'
-            } else {
-                console.log("message is below");
-                console.log(response.msg);
-                alert('Something wrong happened')
+    if (typeof loggedIn == 'underfined') {
+        document.location.href = '/index';
+    } else {
+        $('#search input').each(function (index, val) {
+            if ($(this).val() === '') {
+                errorCount++;
             }
         });
-    } else {
-        console.log('Passwords do not match.')
+        if (errorCount === 0) {
+            console.log('no empty fields');
+            var search = $('field#search input#searchBar').val();
+            var searchAttempt = {
+                'email': loggedIn,
+                'search': search,
+            }
+            $.ajax({
+                type: 'GET',
+                data: createAttempt,
+                url: '/pwpage',
+                dataType: 'JSON'
+                    //NEED TO EDIT BELOW THIS
+            }).done(function (response) {
+                if (response.msg === 'true') {
+                    document.location.href = '/successCreate'
+                } else {
+                    console.log("message is below");
+                    console.log(response.msg);
+                    alert('Something wrong happened')
+                }
+            });
+        } else {
+            console.log('Passwords do not match.')
+        }
     }
 };

@@ -59,6 +59,16 @@ router.post('/login', function (req, res) {
     }
 });
 
+/* get all the pw's, usernames, and services */
+router.get('/pwpage', function (req, res) {
+    var email = req.body.email;
+    var search = req.body.search;
+    var usersRef = ref.child('users');
+    var user = usersRef.child(hash(email));
+    var services = Object.keys(user);
+
+});
+
 /* GET successLogin page. */
 router.get('/successLogin', function (req, res) {
     res.render('successLogin')
