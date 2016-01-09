@@ -31,9 +31,9 @@ function login(event) {
         }).done(function (response) {
             if (response.msg === 'true') {
                 loggedIn = $('field#login input#inputEmail').val();
-                document.location.href = '/successLogin'
+                document.location.href = '/successLogin';
             } else {
-                alert('Wrong email/password')
+                alert('Wrong email/password');
             }
         });
     } else {

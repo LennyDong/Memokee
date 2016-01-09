@@ -66,7 +66,7 @@ router.get('/pwpage', function (req, res) {
 
 /* GET successLogin page. */
 router.get('/successLogin', function (req, res) {
-    res.render('successLogin')
+    res.redirect('pwpage');
 });
 
 router.post('/newuser', function (req, res) {
