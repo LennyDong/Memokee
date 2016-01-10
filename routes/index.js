@@ -68,16 +68,7 @@ router.post('/pwpage', function (req, res) {
     var services = ref.child('users').child(hash(email)).child('list');
     var jS;
     services.once('value', function (snapshot) {
-        jS = Object.keys(snapshot.val());
-
-
-        var possibleHits = [];
-        jS.forEach(function (service) {
-            if (service.indexOf(search.toLowerCase()) === 0) {
-                possibleHits.push(service);
-            }
-        });
-        res.send(possibleHits);
+        res.send(snapshot.val());
     });
 });
 
