@@ -7,7 +7,7 @@ var ref = new firebase('amber-heat-4870.firebaseio.com/');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.render('index', {
-        title: 'Express'
+        title: 'Memokee'
     });
 });
 
@@ -73,8 +73,41 @@ router.post('/pwpage', function (req, res) {
 });
 
 router.get('/pwpage', function (req, res) {
-    res.render('pwpage');
-})
+    res.render('pwpage', {
+        title: 'Welcome!'
+    });
+});
+
+/* Redirect to pwpage. */
+router.get('/addService', function (req, res) {
+    res.redirect('/pwpage');
+});
+
+/* POST to addService. */
+router.post('/addService', function (req, res) {
+    var email = req.body.user;
+    var hashEmail = hash(email);
+    var service = req.body.service;
+    var userRef = ref.child('users').child(hashEmail);
+    userRef.once('value', function (snapshot) {
+        var exists = snapshot.child('list').child(service).val() !== null;
+        if (exists) {
+            res.send({
+                msg: 'Duplicate account for ' + service
+            });
+        } else {
+            var entry = {};
+            entry[service] = {
+                'username': req.body.username,
+                'password': req.body.password
+            }
+            userRef.child('list').update(entry);
+            res.send({
+                msg: ''
+            });
+        }
+    });
+});
 
 /* GET successLogin page. */
 router.get('/successLogin', function (req, res) {

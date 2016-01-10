@@ -3,6 +3,7 @@ $(document).ready(function () {
     $('#btnLogin').on('click', login);
     $('#btnCreate').on('click', createAcc);
     $('#btnSearch').on('click', searchDB);
+    $('#btnAddService').on('click', addService);
 });
 
 var loggedIn = "test@testdomain.com";
@@ -65,8 +66,8 @@ function createAcc(event) {
                 dataType: 'JSON'
             }).done(function (response) {
                 if (response.msg === 'true') {
-                    loggedIn =
-                        document.location.href = '/pwpage'
+                    loggedIn = email
+                    document.location.href = '/pwpage'
                 } else {
                     console.log("message is below");
                     console.log(response.msg);
@@ -148,3 +149,43 @@ function insertOriginal(table) {
     cell2.innerHTML = 'Username';
     cell3.innerHTML = 'Password';
 }
+
+function addService(event) {
+    event.preventDefault();
+    var errorCount = 0;
+    if (typeof loggedIn == 'underfined') {
+        document.location.href = '/index';
+    } else {
+        $('#add input').each(function (index, val) {
+            if ($(this).val() == '') {
+                errorCount ++;
+            }
+        });
+        if (errorCount === 0) {
+            var service = $('field#add input#service').val();
+            var username = $('field#add input#username').val();
+            var password = $('field#add input#password').val();
+            var addRequest = {
+                'user': loggedIn,
+                'service': service,
+                'username': username,
+                'password': password
+            };   
+            $.ajax({
+                type: 'POST',
+                data: addRequest,
+                url: '/addService',
+                dataType: 'JSON'
+            }).done(function (response) {
+                if (response.msg === '') {
+                    $('field#add input').val('');
+                    document.getElementById('addMessage').innerHTML = "Service added";
+                } else {
+                    document.getElementById('addMessage').innerHTML = response.msg;
+                }
+            });
+        } else {
+            document.getElementById('addMessage').innerHTML = 'Please fill all three fields';
+        }
+    }
+};

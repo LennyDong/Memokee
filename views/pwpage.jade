@@ -6,17 +6,29 @@ block content
     
     h1= title
     br
-    p#message Type in service.
-    br
-    field#search(name="adduser")
-        input#searchBar(type="text", placeholder="facebook", name="searchtext")
+    #search
+        p#message Type in service.
         br
-        button#btnSearch(type='button') Search
-    br
-    table#display
-        tr
-            td Service
-            td Username
-            td Password
-    
+        field#search(name="adduser")
+            input#searchBar(type="text", placeholder="facebook", name="searchtext")
+            br
+            button#btnSearch(type='button') Search
+        br
+        table#display
+            tr
+                td Service
+                td Username
+                td Password
+        br
+    #add
+        p#addMessage Add a service.
+        br
+        field#add(name="add service")
+            input#service(type="text", placeholder='Service', name='serviceText')
+            br
+            input#username(type='text', placeholder='Username', name='usernameText')
+            br
+            input#password(type='text', placeholder='Password', name='passwordText')
+            br
+            button#btnAddService(type='button') Add Service
     
