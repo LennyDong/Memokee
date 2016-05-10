@@ -51,7 +51,7 @@ router.post('/login', function (req, res) {
     }, function(error, authData) {
         if (error) {
             res.send({
-                msg: error
+                msg: "Wrong password"
             });
         } else {
             res.send({
@@ -84,7 +84,17 @@ router.post('/pwpage', function (req, res) {
     var services = ref.child('users').child(authData.uid);
     var jS;
     services.once('value', function (snapshot) {
-        res.send(snapshot.val());
+        var exists = snapshot.child(search).val() !== null;
+        if (exists){
+            res.send({
+                'password': getDecipher(snapshot.child(search).child('password').val()),
+                'username': snapshot.child(search).child('username').val()
+            });
+        } else {
+            res.send({
+                msg: ''
+            })
+        }
     });
 });
 
@@ -106,22 +116,23 @@ router.get('/addService', function (req, res) {
 
 /* POST to addService. */
 router.post('/addService', function (req, res) {
+    var authData = ref.getAuth(); 
     var service = req.body.service;
-    var usersRef = ref.child('users');
-    usersRef.once('value', function (snapshot) {
-        var authData = ref.getAuth();    
-        var exists = snapshot.child(authData.uid).child(service).val() !== null;
+    var usersRef = ref.child('users').child(authData.uid);
+    usersRef.once('value', function (snapshot) {  
+        var exists = snapshot.child(service).val() !== null;
         if (exists) {
             res.send({
                 msg: 'Duplicate account for ' + service
             });
         } else {
             var entry = {};
+            var salt = makeid();
             entry[service] = {
                 'username': req.body.username,
-                'password': req.body.password
+                'password': salt + getCipheredPassword(req.body.password, salt)
             };
-            usersRef.child(authData.uid).update(entry);
+            usersRef.update(entry);
             res.send({
                 msg: ''
             });
@@ -190,4 +201,32 @@ router.get('/successCreate', function (req, res) {
     res.render('successCreate')
 });
 
+/* Returns random string of six characters. */
+function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for(var i = 0; i < 6; i += 1){
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+}
+
+/* Get ciphered PASSWORD with SALT. */
+function getCipheredPassword(password, salt) {
+    var cipher = crypto.createCipher('aes-256-cbc', salt);
+    cipher.update(password, 'utf8', 'base64');
+    return cipher.final('base64');
+}
+
+/* Returns the deciphered password with the given CIPHER. */
+function getDecipher(cipher) {
+    var salt = cipher.substring(0, 6);
+    var password = cipher.substring(6, cipher.length);
+    var decipher = crypto.createDecipher('aes-256-cbc', salt);
+    decipher.update(password, 'base64', 'utf8');
+    return decipher.final('utf8')
+    
+}
 module.exports = router;

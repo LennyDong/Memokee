@@ -82,8 +82,6 @@ function createAcc(event) {
                 if (response.msg === 'true') {
                     document.location.href = '/pwpage'
                 } else {
-                    console.log("message is below");
-                    console.log(response.msg);
                     document.getElementById('message').innerHTML = 'Account already exists!';
                 }
             });
@@ -106,7 +104,6 @@ function searchDB(event) {
         }
     });
     if (errorCount === 0) {
-        console.log('no empty fields');
         var search = $('field#search input#searchBar').val();
         display(search);
     } else {
@@ -121,8 +118,8 @@ function insertRow(table, combinations, service) {
     var cell3 = row.insertCell(2);
     var cell4 = row.insertCell(3);
     cell1.innerHTML = service;
-    cell2.innerHTML = combinations[service]['username'];
-    cell3.innerHTML = combinations[service]['password'];
+    cell2.innerHTML = combinations['username'];
+    cell3.innerHTML = combinations['password'];
     cell4.innerHTML = '<td><a href="#" class="linkdeleteuser" rel="' + service + '">Delete</a></td>';
 }
 
@@ -161,6 +158,7 @@ function addService(event) {
             url: '/addService',
             dataType: 'JSON'
         }).done(function (response) {
+            console.log('here in podfdsf');        
             if (response.msg === '') {
                 $('field#add input').val('');
                 document.getElementById('addMessage').innerHTML = "Service added";
@@ -176,7 +174,7 @@ function addService(event) {
 function deleteEntry(event) {
     event.preventDefault();
     var confirmation = confirm('Are you sure you want to delete this entry?');
-
+    console.log($(this).attr('rel'));
     if (confirmation === true) {
         $.ajax({
             type: 'DELETE',
@@ -189,7 +187,8 @@ function deleteEntry(event) {
                 alert('Error: ' + response.msg);
             }
             console.log('here');
-            display($(this).attr('rel'));
+            $("#display tr").remove();
+            insertOriginal(document.getElementById("display"));
         });
     } else {
         return false;
@@ -207,20 +206,16 @@ function display (search) {
         dataType: 'JSON'
     }).done(function (response) {
         //clear table
-        $("#display tr").remove();
-        //set headings of table
-        insertOriginal(document.getElementById("display"));
-        console.log('here');    
-        console.log('response received');
-        console.log(response);
-        keys = Object.keys(response);
-        console.log('keys');
-        console.log(keys);
-        keys.forEach(function (key) {
-            if (key.indexOf(search) !== -1) {
-                document.getElementById("message").innerHTML = 'See results below';
-                insertRow(document.getElementById("display"), response, key);
-            }
-        });
+        if(response.msg != ''){
+            $("#display tr").remove();
+            //set headings of table
+            insertOriginal(document.getElementById("display"));
+            keys = Object.keys(response);
+            document.getElementById("message").innerHTML = 'See results below';
+            insertRow(document.getElementById("display"), response, search);
+        } else {
+            console.log("didn't find");
+            document.getElementById("message").innerHTML = 'Service does not exists';
+        }
     });
 }
